@@ -1,0 +1,924 @@
+/* ============================================================================
+   Analisador Léxico – Calculadora Simples
+   Tema Material Design 3 – Dark / Black
+   ============================================================================ */
+
+/* ─── CSS Custom Properties (M3 Palette – Dark Black) ───────────────────── */
+:root {
+    --primary: rgb(160 200 255);
+    --on-primary: rgb(0 30 60);
+    --primary-container: rgb(30 55 90);
+    --on-primary-container: rgb(210 228 255);
+    --secondary: rgb(190 198 220);
+    --on-secondary: rgb(40 47 60);
+    --secondary-container: rgb(56 64 78);
+    --on-secondary-container: rgb(218 226 249);
+    --tertiary: rgb(210 190 220);
+    --on-tertiary: rgb(56 40 65);
+    --tertiary-container: rgb(75 58 85);
+    --on-tertiary-container: rgb(240 220 255);
+    --error: rgb(255 180 172);
+    --on-error: rgb(105 0 5);
+    --error-container: rgb(55 20 18);
+    --on-error-container: rgb(255 218 214);
+    --surface: rgb(18 18 20);
+    --on-surface: rgb(228 225 230);
+    --surface-container: rgb(30 30 33);
+    --surface-container-low: rgb(24 24 27);
+    --surface-container-high: rgb(40 40 44);
+    --surface-container-highest: rgb(50 50 55);
+    --outline: rgb(140 140 150);
+    --outline-variant: rgb(68 68 75);
+    --inverse-surface: rgb(228 225 230);
+    --inverse-on-surface: rgb(48 48 52);
+    --shadow: rgba(0, 0, 0, 0.35);
+
+    /* Editor */
+    --editor-bg: rgb(12 12 14);
+    --editor-gutter: rgb(22 22 25);
+    --editor-line-num: rgb(100 100 110);
+    --editor-cursor: var(--primary);
+    --editor-selection: rgba(160, 200, 255, 0.18);
+
+    /* Sizes */
+    --nav-rail-width: 80px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 28px;
+}
+
+/* ─── Reset & Base ──────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Noto Sans", "Segoe UI", system-ui, sans-serif;
+    background: var(--surface-container);
+    color: var(--on-surface);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+}
+
+/* ─── Material Symbols ──────────────────────────────────────────────────── */
+.material-symbols-rounded {
+    font-family: 'Material Symbols Rounded';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Navigation Rail ───────────────────────────────────────────────────── */
+.nav-rail {
+    width: var(--nav-rail-width);
+    min-height: 100vh;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 0;
+    gap: 8px;
+    border-right: 1px solid var(--outline-variant);
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+.nav-rail-header {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.nav-rail-header .material-symbols-rounded {
+    font-size: 32px;
+    color: var(--primary);
+}
+
+.nav-rail-items {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 0;
+    width: 100%;
+    color: var(--on-surface);
+    transition: all 0.2s ease;
+}
+
+.nav-indicator {
+    width: 56px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    transition: all 0.2s ease;
+}
+
+.nav-item:hover .nav-indicator {
+    background: var(--surface-container-highest);
+}
+
+.nav-item.active .nav-indicator {
+    background: var(--secondary-container);
+}
+
+.nav-item.active .nav-indicator .material-symbols-rounded {
+    color: var(--on-secondary-container);
+}
+
+.nav-label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    color: var(--on-surface);
+    opacity: 0.7;
+}
+
+.nav-item.active .nav-label {
+    opacity: 1;
+    font-weight: 600;
+}
+
+/* ─── Main Content ──────────────────────────────────────────────────────── */
+.main-content {
+    flex: 1;
+    padding: 24px 24px 24px 0;
+    overflow-y: auto;
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ─── Tab Panels ────────────────────────────────────────────────────────── */
+.tab-panel {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    gap: 16px;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-panel.active {
+    display: flex;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ─── Editor Card ───────────────────────────────────────────────────────── */
+.editor-card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 1px 3px var(--shadow);
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 200px;
+}
+
+.editor-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: var(--surface-container-low);
+    border-bottom: 1px solid var(--outline-variant);
+    gap: 12px;
+}
+
+.toolbar-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--on-surface);
+}
+
+.toolbar-title .material-symbols-rounded {
+    font-size: 20px;
+    color: var(--primary);
+}
+
+.toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.toolbar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: var(--radius-xl);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: var(--surface-container);
+    color: var(--on-surface);
+    height: 36px;
+}
+
+.toolbar-btn:hover {
+    background: var(--surface-container-high);
+}
+
+.toolbar-btn.primary {
+    background: var(--primary);
+    color: var(--on-primary);
+}
+
+.toolbar-btn.primary:hover {
+    background: rgba(160, 200, 255, 0.2);
+    box-shadow: 0 1px 3px var(--shadow);
+}
+
+.toolbar-btn .material-symbols-rounded {
+    font-size: 18px;
+}
+
+/* ─── Code Editor (textarea + line numbers) ─────────────────────────────── */
+.editor-body {
+    display: flex;
+    flex: 1;
+    background: var(--editor-bg);
+    min-height: 140px;
+}
+
+.line-numbers {
+    width: 48px;
+    padding: 12px 8px 12px 0;
+    background: var(--editor-gutter);
+    color: var(--editor-line-num);
+    font-family: "JetBrains Mono", "Cascadia Code", "Fira Code", "Consolas", monospace;
+    font-size: 14px;
+    line-height: 22px;
+    text-align: right;
+    user-select: none;
+    border-right: 1px solid var(--outline-variant);
+    white-space: pre-line;
+    overflow: hidden;
+}
+
+.code-editor {
+    flex: 1;
+    padding: 12px 16px;
+    border: none;
+    background: var(--editor-bg);
+    color: var(--on-surface);
+    font-family: "JetBrains Mono", "Cascadia Code", "Fira Code", "Consolas", monospace;
+    font-size: 14px;
+    line-height: 22px;
+    resize: none;
+    outline: none;
+    overflow-y: auto;
+    tab-size: 4;
+}
+
+.code-editor::placeholder {
+    color: var(--editor-line-num);
+    opacity: 0.6;
+}
+
+.code-editor::selection {
+    background: var(--editor-selection);
+}
+
+/* ─── Output Panel ──────────────────────────────────────────────────────── */
+.output-panel {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 1px 3px var(--shadow);
+    min-height: 240px;
+    display: flex;
+    flex-direction: column;
+}
+
+.output-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--outline-variant);
+    background: var(--surface-container-low);
+}
+
+.output-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border: none;
+    background: transparent;
+    color: var(--on-surface);
+    opacity: 0.6;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.2s ease;
+}
+
+.output-tab:hover {
+    opacity: 0.8;
+    background: var(--surface-container);
+}
+
+.output-tab.active {
+    opacity: 1;
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+.output-tab .material-symbols-rounded {
+    font-size: 18px;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--surface-container-high);
+    color: var(--on-surface);
+}
+
+.badge.error {
+    background: var(--error-container);
+    color: var(--error);
+}
+
+.output-content {
+    display: none;
+    flex: 1;
+    overflow-y: auto;
+    max-height: 350px;
+}
+
+.output-content.active {
+    display: block;
+}
+
+/* ─── Token Chips ───────────────────────────────────────────────────────── */
+.token-chips-area {
+    padding: 16px;
+}
+
+.token-table-new {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.token-table-new thead th {
+    padding: 10px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--on-surface);
+    opacity: 0.6;
+    text-align: left;
+    border-bottom: 1px solid var(--outline-variant);
+    background: var(--surface-container-low);
+}
+
+.token-table-new tbody td {
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--on-surface);
+    border-bottom: 1px solid var(--surface-container);
+}
+
+.token-table-new tbody tr:nth-child(even) {
+    background: var(--surface-container-low);
+}
+
+.token-table-new tbody tr:hover {
+    background: var(--surface-container);
+}
+
+/* Token chip inline */
+.token-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px 4px 4px;
+    border-radius: 20px;
+    border: 1px solid var(--outline-variant);
+    background: var(--surface);
+    height: 32px;
+    font-size: 13px;
+    transition: all 0.15s ease;
+}
+
+.token-chip:hover {
+    box-shadow: 0 1px 4px var(--shadow);
+}
+
+.token-chip .chip-lexema {
+    background: var(--surface-container-high);
+    padding: 2px 10px;
+    border-radius: 14px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--on-surface);
+}
+
+.token-chip .chip-token {
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0.65;
+    color: var(--on-surface);
+}
+
+/* Categorias de chips */
+.token-chip.num-int {
+    border-color: rgb(76 175 80);
+}
+
+.token-chip.num-int .chip-lexema {
+    background: rgb(24 60 26);
+    color: rgb(165 214 167);
+}
+
+.token-chip.num-real {
+    border-color: rgb(255 183 77);
+}
+
+.token-chip.num-real .chip-lexema {
+    background: rgb(60 44 10);
+    color: rgb(255 224 160);
+}
+
+.token-chip.operador {
+    border-color: var(--primary);
+}
+
+.token-chip.operador .chip-lexema {
+    background: var(--primary-container);
+    color: var(--on-primary-container);
+}
+
+.token-chip.parentese {
+    border-color: var(--tertiary);
+}
+
+.token-chip.parentese .chip-lexema {
+    background: var(--tertiary-container);
+    color: var(--on-tertiary-container);
+}
+
+.token-chip.erro {
+    border-color: var(--error);
+}
+
+.token-chip.erro .chip-lexema {
+    background: var(--error-container);
+    color: var(--on-error-container);
+}
+
+/* Token chips flow layout */
+.chips-flow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.chips-section-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--on-surface);
+    opacity: 0.5;
+    margin-bottom: 8px;
+}
+
+/* ─── Error List ────────────────────────────────────────────────────────── */
+.error-list {
+    padding: 16px;
+}
+
+.error-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    background: var(--error-container);
+    color: var(--on-error-container);
+    font-size: 13px;
+    font-family: "JetBrains Mono", monospace;
+    margin-bottom: 8px;
+    animation: fadeIn 0.25s ease;
+}
+
+.error-item .material-symbols-rounded {
+    font-size: 18px;
+    color: var(--error);
+    margin-top: 1px;
+    flex-shrink: 0;
+}
+
+.error-body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+}
+
+.error-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.error-pos {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    background: rgba(255, 180, 172, 0.15);
+    color: var(--error);
+    white-space: nowrap;
+}
+
+.error-context {
+    background: var(--surface-container-low);
+    border: 1px solid var(--outline-variant);
+    border-radius: 6px;
+    padding: 6px 10px;
+    overflow-x: auto;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.error-context code {
+    white-space: pre;
+}
+
+.error-context mark {
+    background: rgba(255, 100, 80, 0.3);
+    color: var(--error);
+    font-weight: 700;
+    border-radius: 2px;
+    padding: 0 2px;
+}
+
+/* ─── Token Table Position Columns ──────────────────────────────────────── */
+.token-table-new .col-pos {
+    text-align: center;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0.8;
+}
+
+/* ─── Empty State ───────────────────────────────────────────────────────── */
+.empty-state {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--on-surface);
+    opacity: 0.4;
+    font-size: 14px;
+    padding: 20px 0;
+}
+
+.empty-state .material-symbols-rounded {
+    font-size: 20px;
+}
+
+/* ─── Page Header ───────────────────────────────────────────────────────── */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0 16px;
+}
+
+.page-header h2 {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--on-surface);
+}
+
+/* ─── Test Table ────────────────────────────────────────────────────────── */
+.test-card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 1px 3px var(--shadow);
+}
+
+.test-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.test-table thead th {
+    padding: 12px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--on-surface);
+    opacity: 0.6;
+    text-align: left;
+    background: var(--surface-container-low);
+    border-bottom: 1px solid var(--outline-variant);
+}
+
+.test-table tbody td {
+    padding: 10px 16px;
+    font-size: 13px;
+    color: var(--on-surface);
+    border-bottom: 1px solid var(--surface-container);
+}
+
+.test-table tbody tr:nth-child(even) {
+    background: var(--surface-container-low);
+}
+
+.test-table code {
+    font-family: "JetBrains Mono", monospace;
+    background: var(--surface-container-high);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.test-table .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.test-table .status-badge.ok {
+    background: rgb(24 60 26);
+    color: rgb(129 199 132);
+}
+
+.test-table .status-badge.fail {
+    background: var(--error-container);
+    color: var(--error);
+}
+
+.test-result-detail {
+    font-size: 12px;
+    color: var(--on-surface);
+    opacity: 0.7;
+    font-family: "JetBrains Mono", monospace;
+    max-width: 500px;
+    word-break: break-word;
+}
+
+/* ─── Automatos ─────────────────────────────────────────────────────────── */
+#automatosContent {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 16px;
+}
+
+.automato-card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 1px 3px var(--shadow);
+}
+
+.automato-card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--outline-variant);
+    background: var(--surface-container-low);
+}
+
+.automato-card-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 6px;
+}
+
+.automato-card-header p {
+    font-size: 13px;
+    color: var(--on-surface);
+    opacity: 0.6;
+}
+
+.automato-card-body {
+    overflow-x: auto;
+    padding: 0;
+}
+
+.automato-table {
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 100%;
+    font-family: "JetBrains Mono", monospace;
+}
+
+.automato-table th {
+    background: var(--surface-container-low);
+    color: var(--primary);
+    font-weight: 600;
+    padding: 10px 12px;
+    border: 1px solid var(--outline-variant);
+    text-align: center;
+    white-space: nowrap;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.automato-table td {
+    padding: 8px 12px;
+    border: 1px solid var(--surface-container);
+    text-align: center;
+    white-space: nowrap;
+}
+
+.automato-table td.err {
+    color: var(--outline);
+    opacity: 0.4;
+    font-style: italic;
+}
+
+.automato-table td.trans {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.automato-table td.estado-cell {
+    background: var(--surface-container-low);
+    color: var(--secondary);
+    font-weight: 600;
+    text-align: left;
+}
+
+.automato-table td.estado-cell.aceita {
+    color: rgb(129 199 132);
+}
+
+/* Legenda */
+.legenda-card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 1px 3px var(--shadow);
+}
+
+.legenda-card h3 {
+    padding: 16px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--primary);
+    border-bottom: 1px solid var(--outline-variant);
+    background: var(--surface-container-low);
+}
+
+.legenda-table {
+    width: 100%;
+    max-width: 500px;
+}
+
+.legenda-table td,
+.legenda-table th {
+    text-align: left;
+}
+
+/* ─── Scrollbar Personalizada ───────────────────────────────────────────── */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--outline-variant);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--outline);
+}
+
+/* ─── Responsivo ────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    body {
+        flex-direction: column;
+    }
+
+    .nav-rail {
+        width: 100%;
+        min-height: auto;
+        flex-direction: row;
+        padding: 8px 12px;
+        border-right: none;
+        border-bottom: 1px solid var(--outline-variant);
+        overflow-x: auto;
+    }
+
+    .nav-rail-header {
+        margin-bottom: 0;
+        margin-right: 12px;
+        width: auto;
+        height: auto;
+    }
+
+    .nav-rail-header .material-symbols-rounded {
+        font-size: 24px;
+    }
+
+    .nav-rail-items {
+        flex-direction: row;
+        gap: 0;
+        width: auto;
+    }
+
+    .nav-item {
+        flex-direction: row;
+        padding: 6px 12px;
+        width: auto;
+        gap: 6px;
+    }
+
+    .nav-indicator {
+        width: 36px;
+        height: 28px;
+    }
+
+    .nav-label {
+        font-size: 12px;
+    }
+
+    .main-content {
+        padding: 16px;
+        max-height: none;
+        overflow-y: visible;
+    }
+}
