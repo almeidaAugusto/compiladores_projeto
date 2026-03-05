@@ -34,7 +34,7 @@
     <!-- ═══ Conteúdo principal ═══ -->
     <main class="main-content">
 
-        <!-- ═══ Aba 1: Tokenizar ═══ -->
+        <!-- ═══ Analisador Léxico ═══ -->
         <section id="tabTokenizar" class="tab-panel active">
 
             <!-- Editor de Código -->
@@ -62,12 +62,12 @@
                 </div>
             </div>
 
-            <!-- Painel inferior: Erros + Tokens -->
+            <!-- Painel de Resultados -->
             <div class="output-panel">
                 <div class="output-tabs">
                     <button class="output-tab active" data-output="outputTokens">
                         <span class="material-symbols-rounded">token</span>
-                        Tokens
+                        Análise Léxica
                         <span class="badge" id="tokenCount">0</span>
                     </button>
                     <button class="output-tab" data-output="outputErros">
@@ -77,7 +77,7 @@
                     </button>
                 </div>
                 <div id="outputTokens" class="output-content active">
-                    <div id="resultArea" class="token-chips-area">
+                    <div id="resultArea" class="result-table-area">
                         <p class="empty-state">
                             <span class="material-symbols-rounded">info</span>
                             Pressione <strong>Compilar</strong> para analisar a expressão

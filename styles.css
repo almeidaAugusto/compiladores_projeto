@@ -1,9 +1,3 @@
-/* ============================================================================
-   Analisador Léxico – Calculadora Simples
-   Tema Material Design 3 – Dark / Black
-   ============================================================================ */
-
-/* ─── CSS Custom Properties (M3 Palette – Dark Black) ───────────────────── */
 :root {
     --primary: rgb(160 200 255);
     --on-primary: rgb(0 30 60);
@@ -410,17 +404,17 @@ body {
     display: block;
 }
 
-/* ─── Token Chips ───────────────────────────────────────────────────────── */
-.token-chips-area {
+/* ─── Token Table ───────────────────────────────────────────────────────── */
+.result-table-area {
     padding: 16px;
 }
 
-.token-table-new {
+.token-table {
     width: 100%;
     border-collapse: collapse;
 }
 
-.token-table-new thead th {
+.token-table thead th {
     padding: 10px 12px;
     font-size: 12px;
     font-weight: 600;
@@ -433,111 +427,22 @@ body {
     background: var(--surface-container-low);
 }
 
-.token-table-new tbody td {
+.token-table tbody td {
     padding: 8px 12px;
     font-size: 13px;
     color: var(--on-surface);
     border-bottom: 1px solid var(--surface-container);
 }
 
-.token-table-new tbody tr:nth-child(even) {
+.token-table tbody tr:nth-child(even) {
     background: var(--surface-container-low);
 }
 
-.token-table-new tbody tr:hover {
+.token-table tbody tr:hover {
     background: var(--surface-container);
 }
 
-/* Token chip inline */
-.token-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 4px 12px 4px 4px;
-    border-radius: 20px;
-    border: 1px solid var(--outline-variant);
-    background: var(--surface);
-    height: 32px;
-    font-size: 13px;
-    transition: all 0.15s ease;
-}
-
-.token-chip:hover {
-    box-shadow: 0 1px 4px var(--shadow);
-}
-
-.token-chip .chip-lexema {
-    background: var(--surface-container-high);
-    padding: 2px 10px;
-    border-radius: 14px;
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--on-surface);
-}
-
-.token-chip .chip-token {
-    font-size: 12px;
-    font-weight: 500;
-    opacity: 0.65;
-    color: var(--on-surface);
-}
-
-/* Categorias de chips */
-.token-chip.num-int {
-    border-color: rgb(76 175 80);
-}
-
-.token-chip.num-int .chip-lexema {
-    background: rgb(24 60 26);
-    color: rgb(165 214 167);
-}
-
-.token-chip.num-real {
-    border-color: rgb(255 183 77);
-}
-
-.token-chip.num-real .chip-lexema {
-    background: rgb(60 44 10);
-    color: rgb(255 224 160);
-}
-
-.token-chip.operador {
-    border-color: var(--primary);
-}
-
-.token-chip.operador .chip-lexema {
-    background: var(--primary-container);
-    color: var(--on-primary-container);
-}
-
-.token-chip.parentese {
-    border-color: var(--tertiary);
-}
-
-.token-chip.parentese .chip-lexema {
-    background: var(--tertiary-container);
-    color: var(--on-tertiary-container);
-}
-
-.token-chip.erro {
-    border-color: var(--error);
-}
-
-.token-chip.erro .chip-lexema {
-    background: var(--error-container);
-    color: var(--on-error-container);
-}
-
-/* Token chips flow layout */
-.chips-flow {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 20px;
-}
-
-.chips-section-title {
+.section-title {
     font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
@@ -622,7 +527,7 @@ body {
 }
 
 /* ─── Token Table Position Columns ──────────────────────────────────────── */
-.token-table-new .col-pos {
+.token-table .col-pos {
     text-align: center;
     font-family: "JetBrains Mono", monospace;
     font-size: 12px;
@@ -643,209 +548,6 @@ body {
 
 .empty-state .material-symbols-rounded {
     font-size: 20px;
-}
-
-/* ─── Page Header ───────────────────────────────────────────────────────── */
-.page-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 0 16px;
-}
-
-.page-header h2 {
-    font-size: 22px;
-    font-weight: 600;
-    color: var(--on-surface);
-}
-
-/* ─── Test Table ────────────────────────────────────────────────────────── */
-.test-card {
-    background: var(--surface);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: 0 1px 3px var(--shadow);
-}
-
-.test-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.test-table thead th {
-    padding: 12px 16px;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--on-surface);
-    opacity: 0.6;
-    text-align: left;
-    background: var(--surface-container-low);
-    border-bottom: 1px solid var(--outline-variant);
-}
-
-.test-table tbody td {
-    padding: 10px 16px;
-    font-size: 13px;
-    color: var(--on-surface);
-    border-bottom: 1px solid var(--surface-container);
-}
-
-.test-table tbody tr:nth-child(even) {
-    background: var(--surface-container-low);
-}
-
-.test-table code {
-    font-family: "JetBrains Mono", monospace;
-    background: var(--surface-container-high);
-    padding: 2px 8px;
-    border-radius: 6px;
-    font-size: 12px;
-}
-
-.test-table .status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 2px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.test-table .status-badge.ok {
-    background: rgb(24 60 26);
-    color: rgb(129 199 132);
-}
-
-.test-table .status-badge.fail {
-    background: var(--error-container);
-    color: var(--error);
-}
-
-.test-result-detail {
-    font-size: 12px;
-    color: var(--on-surface);
-    opacity: 0.7;
-    font-family: "JetBrains Mono", monospace;
-    max-width: 500px;
-    word-break: break-word;
-}
-
-/* ─── Automatos ─────────────────────────────────────────────────────────── */
-#automatosContent {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    padding: 16px;
-}
-
-.automato-card {
-    background: var(--surface);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: 0 1px 3px var(--shadow);
-}
-
-.automato-card-header {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--outline-variant);
-    background: var(--surface-container-low);
-}
-
-.automato-card-header h3 {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--primary);
-    margin-bottom: 6px;
-}
-
-.automato-card-header p {
-    font-size: 13px;
-    color: var(--on-surface);
-    opacity: 0.6;
-}
-
-.automato-card-body {
-    overflow-x: auto;
-    padding: 0;
-}
-
-.automato-table {
-    border-collapse: collapse;
-    font-size: 13px;
-    min-width: 100%;
-    font-family: "JetBrains Mono", monospace;
-}
-
-.automato-table th {
-    background: var(--surface-container-low);
-    color: var(--primary);
-    font-weight: 600;
-    padding: 10px 12px;
-    border: 1px solid var(--outline-variant);
-    text-align: center;
-    white-space: nowrap;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-}
-
-.automato-table td {
-    padding: 8px 12px;
-    border: 1px solid var(--surface-container);
-    text-align: center;
-    white-space: nowrap;
-}
-
-.automato-table td.err {
-    color: var(--outline);
-    opacity: 0.4;
-    font-style: italic;
-}
-
-.automato-table td.trans {
-    color: var(--primary);
-    font-weight: 600;
-}
-
-.automato-table td.estado-cell {
-    background: var(--surface-container-low);
-    color: var(--secondary);
-    font-weight: 600;
-    text-align: left;
-}
-
-.automato-table td.estado-cell.aceita {
-    color: rgb(129 199 132);
-}
-
-/* Legenda */
-.legenda-card {
-    background: var(--surface);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: 0 1px 3px var(--shadow);
-}
-
-.legenda-card h3 {
-    padding: 16px 20px;
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--primary);
-    border-bottom: 1px solid var(--outline-variant);
-    background: var(--surface-container-low);
-}
-
-.legenda-table {
-    width: 100%;
-    max-width: 500px;
-}
-
-.legenda-table td,
-.legenda-table th {
-    text-align: left;
 }
 
 /* ─── Scrollbar Personalizada ───────────────────────────────────────────── */

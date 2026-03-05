@@ -385,8 +385,8 @@ document.addEventListener("DOMContentLoaded", () => {
         errorCountBadge.textContent = erros.length;
 
         if (tokens.length > 0) {
-            let html = '<p class="chips-section-title">Tabela de an\u00e1lise l\u00e9xica</p>';
-            html += "<table class='token-table-new'>";
+            let html = '<p class="section-title">Tabela de an\u00e1lise l\u00e9xica</p>';
+            html += "<table class='token-table'>";
             html += "<thead><tr><th>N\u00ba</th><th>Lexema</th><th>Token</th><th>Tipo</th><th>Posi\u00e7\u00e3o</th><th>Col. Ini</th><th>Col. Fim</th></tr></thead><tbody>";
             tokens.forEach((t, idx) => {
                 const tipo = (t.cod === T_NUM_INT) ? "Inteiro" :
