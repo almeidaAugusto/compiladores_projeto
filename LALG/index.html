@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analisador Léxico — LALG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Raleway:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+</head>
+
+<body>
+
+    <!-- ═══ Navigation Rail (lateral) ═══ -->
+    <nav class="nav-rail">
+        <div class="nav-rail-header"></div>
+        <div class="nav-rail-items">
+            <button class="nav-item active" data-tab="tabTokenizar" title="Analisador Léxico">
+                <div class="nav-indicator">
+                    <span class="material-symbols-rounded">code</span>
+                </div>
+                <span class="nav-label">Analisador Léxico</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ═══ Conteúdo principal ═══ -->
+    <main class="main-content">
+
+        <!-- ═══ Analisador Léxico ═══ -->
+        <section id="tabTokenizar" class="tab-panel active">
+
+            <!-- Editor de Código -->
+            <div class="editor-card">
+                <div class="editor-toolbar">
+                    <div class="toolbar-title">
+                        <span class="material-symbols-rounded">edit_note</span>
+                        <span>Editor LALG</span>
+                    </div>
+                    <div class="toolbar-actions">
+                        <button id="btnExemplo" class="toolbar-btn" title="Carregar Exemplo">
+                            <span class="material-symbols-rounded">science</span>
+                            <span>Exemplo</span>
+                        </button>
+                        <button id="btnCarregar" class="toolbar-btn" title="Carregar Arquivo">
+                            <span class="material-symbols-rounded">upload_file</span>
+                            <span>Carregar</span>
+                        </button>
+                        <input type="file" id="fileInput" accept=".txt,.lalg" style="display:none">
+                        <button id="btnSalvar" class="toolbar-btn" title="Salvar código fonte">
+                            <span class="material-symbols-rounded">save</span>
+                            <span>Salvar</span>
+                        </button>
+                        <button id="btnLimpar" class="toolbar-btn" title="Limpar">
+                            <span class="material-symbols-rounded">delete</span>
+                        </button>
+                        <button id="btnTokenizar" class="toolbar-btn primary" title="Tokenizar">
+                            <span class="material-symbols-rounded">play_arrow</span>
+                            <span>Compilar</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="editor-body">
+                    <div class="line-numbers" id="lineNumbers">1</div>
+                    <div class="editor-wrapper">
+                        <pre class="highlight-overlay" id="highlightOverlay" aria-hidden="true"></pre>
+                        <textarea id="inputExpr" class="code-editor"
+                            placeholder="Digite o código LALG aqui...&#10;Ex.: program exemplo;&#10;begin&#10;  write(42)&#10;end."
+                            spellcheck="false"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Painel de Resultados -->
+            <div class="output-panel">
+                <div class="output-tabs">
+                    <button class="output-tab active" data-output="outputTokens">
+                        <span class="material-symbols-rounded">token</span>
+                        Análise Léxica
+                        <span class="badge" id="tokenCount">0</span>
+                    </button>
+                    <button class="output-tab" data-output="outputSimbolos">
+                        <span class="material-symbols-rounded">table_chart</span>
+                        Tabela de Símbolos
+                        <span class="badge" id="simbolosCount">0</span>
+                    </button>
+                    <button class="output-tab" data-output="outputEstatisticas">
+                        <span class="material-symbols-rounded">bar_chart</span>
+                        Estatísticas
+                    </button>
+                    <button class="output-tab" data-output="outputErros">
+                        <span class="material-symbols-rounded">error</span>
+                        Erros
+                        <span class="badge error" id="errorCount">0</span>
+                    </button>
+                </div>
+                <div id="outputTokens" class="output-content active">
+                    <div id="resultArea" class="result-table-area">
+                        <p class="empty-state">
+                            <span class="material-symbols-rounded">info</span>
+                            Pressione <strong>Compilar</strong> para analisar o código LALG
+                        </p>
+                    </div>
+                </div>
+                <div id="outputSimbolos" class="output-content">
+                    <div id="simbolosArea" class="result-table-area"></div>
+                </div>
+                <div id="outputEstatisticas" class="output-content">
+                    <div id="estatisticasArea" class="result-table-area"></div>
+                </div>
+                <div id="outputErros" class="output-content">
+                    <div id="errorArea" class="error-list"></div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>
