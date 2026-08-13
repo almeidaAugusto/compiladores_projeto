@@ -2,18 +2,6 @@
     const LALG = window.LALG = window.LALG || {};
     const { Buffer, isDigito, isLetra, isWhitespace, PALAVRAS_RESERVADAS, TOKEN_NOMES, TOKENS } = LALG;
 
-    const ESTADO = {
-        INICIO: "INICIO",
-        IDENT: "IDENT",
-        NUMERO: "NUMERO",
-        DOIS_PTS: "DOIS_PTS",
-        MENOR_Q: "MENOR_Q",
-        MAIOR_Q: "MAIOR_Q",
-        BARRA_Q: "BARRA_Q",
-        COMENT_BLOCO: "COMENT_BLOCO",
-        COMENT_LINHA: "COMENT_LINHA",
-    };
-
     const SIMPLES_MAP = {
         "=": TOKENS.IGUAL,
         "+": TOKENS.MAIS,
@@ -27,6 +15,40 @@
         "[": TOKENS.ABRE_COL,
         "]": TOKENS.FECHA_COL,
     };
+
+    class ErroLexico extends Error {
+        constructor(mensagem, detalhe = {}) {
+            super(String(mensagem));
+            this.name = "ErroLexico";
+            this.codigo = detalhe.codigo ?? "ERRO_LEXICO";
+            this.fase = "lexico";
+            this.etapa = "lexico";
+            this.mensagem = this.message;
+            this.lexema = detalhe.lexema ?? "";
+
+            // Campos legados usados pela interface.
+            this.line = detalhe.startLine ?? null;
+            this.col = detalhe.startCol ?? null;
+            this.endLine = detalhe.endLine ?? this.line;
+            this.endCol = detalhe.endCol ?? this.col;
+            this.index = detalhe.startIndex ?? null;
+            this.endIndex = detalhe.endIndex ?? this.index;
+
+            this.detalhe = {
+                codigo: this.codigo,
+                fase: this.fase,
+                lexema: this.lexema,
+                posicao: {
+                    linha: this.line,
+                    coluna: this.col,
+                    linhaFim: this.endLine,
+                    colunaFim: this.endCol,
+                    indiceInicio: this.index,
+                    indiceFim: this.endIndex,
+                },
+            };
+        }
+    }
 
     function scanner(entrada) {
         const buf = new Buffer(entrada);
@@ -47,12 +69,11 @@
             });
         }
 
-        function erro(mensagem, startLine, startCol, endCol, index) {
-            erros.push({ mensagem, line: startLine, col: startCol, endCol, index });
+        function erro(codigo, mensagem, detalhe) {
+            erros.push(new ErroLexico(mensagem, { codigo, ...detalhe }));
         }
 
         while (!buf.eof()) {
-            let estado = ESTADO.INICIO;
             let lexema = "";
             let startLine;
             let startCol;
@@ -69,7 +90,6 @@
             startIndex = posInfo.pos;
 
             if (isLetra(c)) {
-                estado = ESTADO.IDENT;
                 lexema = c;
 
                 while (!buf.eof()) {
@@ -89,7 +109,6 @@
             }
 
             if (isDigito(c)) {
-                estado = ESTADO.NUMERO;
                 lexema = c;
 
                 while (!buf.eof()) {
@@ -107,7 +126,6 @@
             }
 
             if (c === ":") {
-                estado = ESTADO.DOIS_PTS;
                 const next = buf.lookahead();
 
                 if (next === "=") {
@@ -120,7 +138,6 @@
             }
 
             if (c === "<") {
-                estado = ESTADO.MENOR_Q;
                 const next = buf.lookahead();
 
                 if (next === ">") {
@@ -136,7 +153,6 @@
             }
 
             if (c === ">") {
-                estado = ESTADO.MAIOR_Q;
                 const next = buf.lookahead();
 
                 if (next === "=") {
@@ -149,24 +165,29 @@
             }
 
             if (c === "/") {
-                estado = ESTADO.BARRA_Q;
                 const next = buf.lookahead();
 
                 if (next === "/") {
                     buf.ler();
-                    estado = ESTADO.COMENT_LINHA;
                     while (!buf.eof()) {
                         const ch = buf.ler();
-                        if (ch === "\n") break;
+                        if (ch === "\n" || ch === "\r") break;
                     }
                 } else {
-                    erro("caractere inv\u00e1lido '/'", startLine, startCol, startCol, startIndex);
+                    erro("CARACTERE_INVALIDO", "caractere inv\u00e1lido '/'", {
+                        lexema: c,
+                        startLine,
+                        startCol,
+                        endLine: startLine,
+                        endCol: startCol,
+                        startIndex,
+                        endIndex: startIndex,
+                    });
                 }
                 continue;
             }
 
             if (c === "{") {
-                estado = ESTADO.COMENT_BLOCO;
                 let fechou = false;
 
                 while (!buf.eof()) {
@@ -178,13 +199,30 @@
                 }
 
                 if (!fechou) {
-                    erro("coment\u00e1rio de bloco '{' n\u00e3o fechado", startLine, startCol, startCol, startIndex);
+                    const ultimaLeitura = buf.getInfoLeitura();
+                    erro("COMENTARIO_NAO_FECHADO", "coment\u00e1rio de bloco '{' n\u00e3o fechado", {
+                        lexema: entrada.slice(startIndex, buf.pos),
+                        startLine,
+                        startCol,
+                        endLine: ultimaLeitura?.line ?? startLine,
+                        endCol: ultimaLeitura?.col ?? startCol,
+                        startIndex,
+                        endIndex: ultimaLeitura?.pos ?? startIndex,
+                    });
                 }
                 continue;
             }
 
             if (c === "}") {
-                erro("'}' sem '{' correspondente", startLine, startCol, startCol, startIndex);
+                erro("FECHA_COMENTARIO_SEM_ABERTURA", "'}' sem '{' correspondente", {
+                    lexema: c,
+                    startLine,
+                    startCol,
+                    endLine: startLine,
+                    endCol: startCol,
+                    startIndex,
+                    endIndex: startIndex,
+                });
                 continue;
             }
 
@@ -194,24 +232,56 @@
                 continue;
             }
 
-            erro(`caractere inv\u00e1lido '${c}'`, startLine, startCol, startCol, startIndex);
+            erro("CARACTERE_INVALIDO", `caractere inv\u00e1lido '${c}'`, {
+                lexema: c,
+                startLine,
+                startCol,
+                endLine: startLine,
+                endCol: startCol,
+                startIndex,
+                endIndex: startIndex,
+            });
         }
 
+        const eof = {
+            cod: TOKENS.EOF,
+            token: TOKEN_NOMES[TOKENS.EOF],
+            lexema: "<EOF>",
+            startLine: buf.line,
+            startCol: buf.col,
+            endLine: buf.line,
+            endCol: buf.col,
+            startIndex: buf.pos,
+            endIndex: buf.pos,
+        };
+        const tokensSaida = tokens.map((t) => ({
+            token: t.token,
+            lexema: t.lexema,
+            cod: t.cod,
+            startLine: t.startLine,
+            startCol: t.startCol,
+            endLine: t.endLine,
+            endCol: t.endCol,
+            startIndex: t.startIndex,
+            endIndex: t.endIndex,
+        }));
+
+        // O EOF viaja junto do vetor mesmo quando consumidores antigos passam
+        // somente `resultado.tokens` para o parser. Por ser nao enumeravel, ele
+        // nao aparece como um token comum na tabela da interface.
+        Object.defineProperty(tokensSaida, "eof", {
+            value: eof,
+            enumerable: false,
+            writable: false,
+        });
+
         return {
-            tokens: tokens.map((t) => ({
-                token: t.token,
-                lexema: t.lexema,
-                cod: t.cod,
-                startLine: t.startLine,
-                startCol: t.startCol,
-                endLine: t.endLine,
-                endCol: t.endCol,
-                startIndex: t.startIndex,
-                endIndex: t.endIndex,
-            })),
+            tokens: tokensSaida,
             erros,
+            eof,
         };
     }
 
+    LALG.ErroLexico = ErroLexico;
     LALG.scanner = scanner;
 })();

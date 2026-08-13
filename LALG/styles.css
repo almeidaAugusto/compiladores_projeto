@@ -269,6 +269,12 @@ body {
     box-shadow: 0 1px 3px var(--shadow);
 }
 
+.toolbar-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.48;
+    box-shadow: none;
+}
+
 .toolbar-btn .material-symbols-rounded {
     font-size: 18px;
 }
@@ -352,6 +358,11 @@ body {
 
 .hl-keyword {
     color: rgb(198 120 221);
+    font-weight: 600;
+}
+
+.hl-predefined {
+    color: rgb(97 175 239);
     font-weight: 600;
 }
 
@@ -452,6 +463,11 @@ body {
 .badge.success {
     background: rgba(152, 195, 121, 0.18);
     color: rgb(152 195 121);
+}
+
+.badge.warning {
+    background: rgba(229, 192, 123, 0.18);
+    color: rgb(229 192 123);
 }
 
 .output-content {
@@ -583,6 +599,42 @@ body {
 
 .error-summary .material-symbols-rounded {
     font-size: 18px;
+}
+
+.warning-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    margin-bottom: 12px;
+    border-radius: var(--radius-sm);
+    background: rgba(229, 192, 123, 0.1);
+    color: rgb(229 192 123);
+    font-size: 13px;
+    font-weight: 600;
+    border-left: 3px solid rgb(229 192 123);
+}
+
+.warning-summary .material-symbols-rounded {
+    font-size: 18px;
+}
+
+.warning-item {
+    background: rgba(229, 192, 123, 0.12);
+    color: var(--on-surface);
+}
+
+.error-item.warning-item .material-symbols-rounded,
+.warning-item .error-pos {
+    color: rgb(229 192 123);
+}
+
+.warning-item .error-pos {
+    background: rgba(229, 192, 123, 0.16);
+}
+
+.warning-item.error-clickable:hover {
+    background: rgba(229, 192, 123, 0.2);
 }
 
 .error-msg {
@@ -717,6 +769,381 @@ body {
 
 .empty-state .material-symbols-rounded {
     font-size: 20px;
+}
+
+.mepa-execution-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    border-bottom: 1px solid var(--outline-variant);
+    background: var(--surface-container-low);
+}
+
+.mepa-execution-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.45px;
+    text-transform: uppercase;
+    color: var(--on-surface);
+    opacity: 0.62;
+}
+
+.mepa-execution-input {
+    width: 100%;
+    min-height: 76px;
+    padding: 10px 12px;
+    resize: vertical;
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-sm);
+    outline: none;
+    background: var(--editor-bg);
+    color: var(--on-surface);
+    font-family: "JetBrains Mono", "Cascadia Code", "Fira Code", "Consolas", monospace;
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.mepa-execution-input:focus {
+    border-color: var(--primary);
+}
+
+.mepa-execution-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.mepa-code,
+.mepa-output,
+.mepa-runtime-input {
+    margin: 0;
+    padding: 14px;
+    overflow: auto;
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-sm);
+    background: var(--editor-bg);
+    color: var(--on-surface);
+    font-family: "JetBrains Mono", "Cascadia Code", "Fira Code", "Consolas", monospace;
+    font-size: 13px;
+    line-height: 1.65;
+    white-space: pre;
+}
+
+.mepa-output {
+    min-height: 52px;
+    white-space: pre-wrap;
+}
+
+.mepa-runtime-input {
+    min-height: 46px;
+    white-space: pre-wrap;
+}
+
+.mepa-code-list-container {
+    max-height: 308px;
+    padding: 0;
+    white-space: normal;
+}
+
+.mepa-code-list {
+    min-width: max-content;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.mepa-code-line {
+    display: grid;
+    grid-template-columns: 54px minmax(0, 1fr);
+    align-items: baseline;
+    min-height: 30px;
+    border-left: 3px solid transparent;
+    color: var(--on-surface);
+    white-space: pre;
+}
+
+.mepa-code-line + .mepa-code-line {
+    border-top: 1px solid rgba(255, 255, 255, 0.035);
+}
+
+.mepa-code-line.active {
+    border-left-color: var(--primary);
+    background: rgba(160, 200, 255, 0.14);
+    color: var(--primary);
+}
+
+.mepa-code-line.runtime-error {
+    border-left-color: var(--error);
+    background: rgba(255, 80, 60, 0.12);
+}
+
+.mepa-code-index {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-height: 30px;
+    padding: 0 10px 0 8px;
+    color: var(--on-surface);
+    opacity: 0.46;
+    border-right: 1px solid var(--outline-variant);
+    user-select: none;
+}
+
+.mepa-code-line.active .mepa-code-index {
+    color: var(--primary);
+    opacity: 1;
+}
+
+.mepa-code-line code {
+    display: block;
+    min-width: 0;
+    padding: 5px 12px;
+    color: inherit;
+    font: inherit;
+}
+
+.mepa-source-map {
+    margin-top: 12px;
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-sm);
+    background: var(--surface-container-low);
+}
+
+.mepa-source-map summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 11px 12px;
+    color: var(--on-surface);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.mepa-source-map summary::marker {
+    color: var(--primary);
+}
+
+.mepa-source-map-groups {
+    display: grid;
+    gap: 8px;
+    padding: 0 12px 12px;
+}
+
+.mepa-source-map-group {
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-sm);
+    background: var(--surface-container);
+}
+
+.mepa-source-map-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 10px;
+    color: var(--on-surface);
+    font-size: 12px;
+}
+
+.mepa-source-kind,
+.mepa-source-position {
+    color: var(--on-surface);
+    font-size: 11px;
+    opacity: 0.62;
+}
+
+.mepa-source-kind {
+    padding: 2px 6px;
+    border-radius: var(--radius-xl);
+    background: rgba(160, 200, 255, 0.14);
+    color: var(--primary);
+    opacity: 1;
+}
+
+.mepa-source-instructions {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    font-family: "JetBrains Mono", "Cascadia Code", "Fira Code", "Consolas", monospace;
+    font-size: 12px;
+}
+
+.mepa-source-instructions li {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    gap: 8px;
+    padding: 6px 10px;
+    color: var(--on-surface);
+}
+
+.mepa-source-instructions li + li {
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.mepa-source-instructions li > span {
+    opacity: 0.52;
+}
+
+.mepa-source-instructions code {
+    overflow: auto;
+    color: inherit;
+    font: inherit;
+    white-space: pre;
+}
+
+.mepa-runtime-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mepa-runtime-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.12fr) minmax(260px, 0.88fr);
+    gap: 12px;
+    align-items: start;
+}
+
+.mepa-runtime-code,
+.mepa-machine-state,
+.mepa-runtime-section {
+    min-width: 0;
+}
+
+.mepa-runtime-code,
+.mepa-machine-state,
+.mepa-runtime-io > .mepa-runtime-section {
+    padding: 14px;
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-sm);
+    background: var(--surface-container-low);
+}
+
+.mepa-state-cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.mepa-state-card {
+    min-width: 0;
+    padding: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-sm);
+    background: var(--surface-container);
+}
+
+.mepa-current-instruction {
+    grid-column: 1 / -1;
+}
+
+.mepa-state-label {
+    margin: 0 0 6px;
+    color: var(--on-surface);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.45px;
+    opacity: 0.58;
+    text-transform: uppercase;
+}
+
+.mepa-state-card code,
+.mepa-state-value,
+.mepa-last-instruction code {
+    font-family: "JetBrains Mono", "Cascadia Code", "Fira Code", "Consolas", monospace;
+}
+
+.mepa-state-card code {
+    display: block;
+    overflow: auto;
+    color: var(--primary);
+    font-size: 13px;
+    white-space: pre;
+}
+
+.mepa-state-value {
+    margin: 0;
+    color: var(--on-surface);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.mepa-last-instruction,
+.mepa-input-progress {
+    margin: 10px 0 0;
+    color: var(--on-surface);
+    font-size: 12px;
+    opacity: 0.62;
+}
+
+.mepa-memory-section {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--outline-variant);
+}
+
+.mepa-memory-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-sm);
+}
+
+.mepa-memory-table {
+    width: 100%;
+    min-width: 260px;
+    border-collapse: collapse;
+}
+
+.mepa-memory-table th,
+.mepa-memory-table td {
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--surface-container);
+}
+
+.mepa-memory-table th {
+    color: var(--on-surface);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.45px;
+    opacity: 0.58;
+    text-transform: uppercase;
+}
+
+.mepa-memory-table td {
+    color: var(--on-surface);
+    font-size: 13px;
+}
+
+.mepa-memory-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.mepa-memory-top {
+    background: rgba(160, 200, 255, 0.12);
+}
+
+.mepa-top-badge {
+    display: inline-flex;
+    padding: 2px 7px;
+    border-radius: var(--radius-xl);
+    background: rgba(160, 200, 255, 0.18);
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.mepa-runtime-io {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
 }
 
 .result-section {
@@ -1015,6 +1442,15 @@ body {
     .toolbar-actions {
         width: 100%;
         justify-content: flex-start;
+    }
+
+    .mepa-execution-actions {
+        justify-content: flex-start;
+    }
+
+    .mepa-runtime-grid,
+    .mepa-runtime-io {
+        grid-template-columns: 1fr;
     }
 
     .summary-grid {

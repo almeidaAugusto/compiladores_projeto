@@ -3,25 +3,48 @@
     const { TOKENS } = LALG;
 
     const SINTATICO_TOKENS = Object.freeze({
+        PROGRAM: TOKENS.PROGRAM,
+        BEGIN: TOKENS.BEGIN,
+        END: TOKENS.END,
+        PROCEDURE: TOKENS.PROCEDURE,
+        VAR: TOKENS.VAR,
+        IF: TOKENS.IF,
+        THEN: TOKENS.THEN,
+        ELSE: TOKENS.ELSE,
+        WHILE: TOKENS.WHILE,
+        DO: TOKENS.DO,
+        NOT: TOKENS.NOT,
+        OR: TOKENS.OR,
+        AND: TOKENS.AND,
+        DIV: TOKENS.DIV,
         IDENTIFICADOR: TOKENS.IDENTIFICADOR,
-        INT: TOKENS.INT,
-        BOOLEAN: TOKENS.BOOLEAN,
-        VIRGULA: TOKENS.VIRGULA,
+        NUMERO: TOKENS.NUMERO,
+        ATRIBUICAO: TOKENS.ATRIBUICAO,
         PONTO_E_VIRGULA: TOKENS.PONTO_VIRGULA,
-        EOF: "EOF",
+        PONTO_FINAL: TOKENS.PONTO_FINAL,
+        VIRGULA: TOKENS.VIRGULA,
+        DOIS_PONTOS: TOKENS.DOIS_PONTOS,
+        ABRE_PAR: TOKENS.ABRE_PAR,
+        FECHA_PAR: TOKENS.FECHA_PAR,
+        ABRE_COL: TOKENS.ABRE_COL,
+        FECHA_COL: TOKENS.FECHA_COL,
+        IGUAL: TOKENS.IGUAL,
+        DIFERENTE: TOKENS.DIFERENTE,
+        MENOR: TOKENS.MENOR,
+        MENOR_IGUAL: TOKENS.MENOR_IGUAL,
+        MAIOR: TOKENS.MAIOR,
+        MAIOR_IGUAL: TOKENS.MAIOR_IGUAL,
+        MAIS: TOKENS.MAIS,
+        MENOS: TOKENS.MENOS,
+        VEZES: TOKENS.VEZES,
+        EOF: TOKENS.EOF,
     });
 
-    function nomeTerminal(cod) {
-        if (cod === SINTATICO_TOKENS.IDENTIFICADOR) return "IDENTIFICADOR";
-        if (cod === SINTATICO_TOKENS.INT) return "int";
-        if (cod === SINTATICO_TOKENS.BOOLEAN) return "boolean";
-        if (cod === SINTATICO_TOKENS.VIRGULA) return "','";
-        if (cod === SINTATICO_TOKENS.PONTO_E_VIRGULA) return "';'";
-        if (cod === SINTATICO_TOKENS.EOF) return "EOF";
-        return String(cod);
-    }
-
     function criarTokenEOF(tokens) {
+        if (tokens?.eof?.cod === SINTATICO_TOKENS.EOF) {
+            return tokens.eof;
+        }
+
         if (!tokens || tokens.length === 0) {
             return {
                 cod: SINTATICO_TOKENS.EOF,
@@ -56,11 +79,24 @@
         };
     }
 
-    function criarEntradaSintatica(tokensLexicos) {
-        return [...tokensLexicos, criarTokenEOF(tokensLexicos)];
+    function criarEntradaSintatica(tokensLexicos, eofExplicito = null) {
+        const tokens = Array.isArray(tokensLexicos)
+            ? tokensLexicos
+            : (tokensLexicos?.tokens ?? []);
+        const eofInformado = eofExplicito ?? tokensLexicos?.eof ?? tokens.eof;
+        const ultimo = tokens[tokens.length - 1];
+
+        if (ultimo?.cod === SINTATICO_TOKENS.EOF) {
+            return [...tokens];
+        }
+
+        if (eofInformado?.cod === SINTATICO_TOKENS.EOF) {
+            return [...tokens, eofInformado];
+        }
+
+        return [...tokens, criarTokenEOF(tokens)];
     }
 
     LALG.SINTATICO_TOKENS = SINTATICO_TOKENS;
-    LALG.nomeTerminal = nomeTerminal;
     LALG.criarEntradaSintatica = criarEntradaSintatica;
 })();

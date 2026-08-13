@@ -3,7 +3,8 @@
     const { escapeHtml } = LALG;
 
     function highlightCode(code, erros) {
-        const PALAVRAS_RE = /\b(program|begin|end|procedure|var|if|then|else|while|do|not|or|and|div|read|write|true|false|int|boolean)\b/gi;
+        const PALAVRAS_RE = /\b(program|begin|end|procedure|var|if|then|else|while|do|not|or|and|div)\b/gi;
+        const PREDECLARADOS_RE = /\b(int|boolean|read|write|true|false)\b/gi;
         const NUMERO_RE = /\b\d+\b/g;
         const COMENTARIO_BLOCO_RE = /\{[^}]*\}/g;
         const COMENTARIO_LINHA_RE = /\/\/[^\n]*/g;
@@ -25,6 +26,7 @@
         addSpans(COMENTARIO_BLOCO_RE, "hl-comment");
         addSpans(COMENTARIO_LINHA_RE, "hl-comment");
         addSpans(PALAVRAS_RE, "hl-keyword");
+        addSpans(PREDECLARADOS_RE, "hl-predefined");
         addSpans(NUMERO_RE, "hl-number");
         addSpans(OP_RE, "hl-operator");
 

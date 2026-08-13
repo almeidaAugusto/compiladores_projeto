@@ -3,7 +3,7 @@
 
     function initLexicoUI({
         scanner,
-        buildTabelaSimbolos,
+        buildIndiceOcorrenciasLexicas,
         getTokenCategoria,
         highlightCode,
         codigoExemplo,
@@ -56,6 +56,16 @@
                 simbolosArea.innerHTML = "";
             }
 
+            function invalidateResultado() {
+                state.ultimoResultado = null;
+                state.ultimosErros = [];
+                resetBadges();
+                resultArea.innerHTML = '<p class="empty-state"><span class="material-symbols-rounded">info</span>Pressione <strong>Compilar</strong> para analisar o c\u00f3digo LALG</p>';
+                errorArea.innerHTML = "";
+                simbolosArea.innerHTML = "";
+                updateHighlight([]);
+            }
+
             function updateLineNumbers() {
                 const lines = inputExpr.value.split("\n").length;
                 lineNumbers.textContent = Array.from({ length: lines }, (_, i) => i + 1).join("\n");
@@ -88,9 +98,10 @@
                 errorArea.querySelectorAll(".error-clickable").forEach((item) => {
                     item.addEventListener("click", () => {
                         const idx = parseInt(item.dataset.errorIndex, 10);
+                        const endIdx = parseInt(item.dataset.errorEndIndex, 10);
                         if (!isNaN(idx)) {
                             inputExpr.focus();
-                            inputExpr.setSelectionRange(idx, idx + 1);
+                            inputExpr.setSelectionRange(idx, Math.min((isNaN(endIdx) ? idx : endIdx) + 1, inputExpr.value.length));
                         }
                     });
                 });
@@ -107,26 +118,23 @@
 
             inputExpr.addEventListener("input", () => {
                 updateLineNumbers();
-                updateHighlight();
+                invalidateResultado();
+                switchToTab("outputTokens");
             });
             inputExpr.addEventListener("scroll", syncScroll);
 
             btnExemplo.addEventListener("click", () => {
                 inputExpr.value = codigoExemplo;
                 updateLineNumbers();
-                updateHighlight();
+                invalidateResultado();
+                switchToTab("outputTokens");
             });
 
             btnLimpar.addEventListener("click", () => {
                 inputExpr.value = "";
-                state.ultimosErros = [];
                 updateLineNumbers();
-                updateHighlight([]);
-                resultArea.innerHTML = '<p class="empty-state"><span class="material-symbols-rounded">info</span>Pressione <strong>Compilar</strong> para analisar o c\u00f3digo LALG</p>';
-                errorArea.innerHTML = "";
-                simbolosArea.innerHTML = "";
-                resetBadges();
-                state.ultimoResultado = null;
+                invalidateResultado();
+                switchToTab("outputTokens");
             });
 
             btnCarregar.addEventListener("click", () => {
@@ -140,7 +148,8 @@
                 reader.onload = (ev) => {
                     inputExpr.value = ev.target.result;
                     updateLineNumbers();
-                    updateHighlight();
+                    invalidateResultado();
+                    switchToTab("outputTokens");
                 };
                 reader.readAsText(file, "UTF-8");
                 fileInput.value = "";
@@ -162,9 +171,14 @@
                 clearOutputAreas();
                 resetBadges();
                 state.ultimoResultado = null;
+                state.ultimosErros = [];
 
                 const expr = inputExpr.value;
-                if (expr.trim() === "") return;
+                if (expr.trim() === "") {
+                    invalidateResultado();
+                    switchToTab("outputTokens");
+                    return;
+                }
 
                 const resultado = scanner(expr);
                 const tokens = resultado.tokens;
@@ -179,7 +193,7 @@
                     bindTokenRowSelection();
                 }
 
-                const tabelaSim = buildTabelaSimbolos(tokens);
+                const tabelaSim = buildIndiceOcorrenciasLexicas(tokens);
                 simbolosCountBadge.textContent = tabelaSim.size;
                 simbolosArea.innerHTML = renderSimbolosArea(tabelaSim);
 

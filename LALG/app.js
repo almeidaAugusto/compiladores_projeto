@@ -1,22 +1,31 @@
 (() => {
     const LALG = window.LALG = window.LALG || {};
-    const EXEMPLO_DECLARACOES = `int a, b;
-boolean ativo;`;
+    const EXEMPLO_PROGRAMA = `program exemplo;
+int x, y;
+begin
+  x := 1;
+  y := x + 2;
+  write(y)
+end.`;
 
     function bootstrapApp() {
         if (LALG.__appInicializada) return;
 
         const dependenciasObrigatorias = [
             "scanner",
-            "buildTabelaSimbolos",
+            "buildIndiceOcorrenciasLexicas",
             "getTokenCategoria",
             "highlightCode",
             "CODIGO_EXEMPLO",
             "initLexicoUI",
             "initMainTabs",
-            "analisarDeclaracoesVariaveis",
+            "analisarPrograma",
             "criarEntradaSintatica",
             "initSintaticoUI",
+            "analisarSemantica",
+            "gerarMepa",
+            "MepaInterpreter",
+            "initSemanticoUI",
         ];
 
         const faltantes = dependenciasObrigatorias.filter((nome) => typeof LALG[nome] === "undefined");
@@ -25,23 +34,31 @@ boolean ativo;`;
         }
 
         LALG.__appInicializada = true;
-        LALG.EXEMPLO_DECLARACOES = EXEMPLO_DECLARACOES;
+        LALG.EXEMPLO_PROGRAMA = EXEMPLO_PROGRAMA;
 
         LALG.initMainTabs();
 
         LALG.initLexicoUI({
             scanner: LALG.scanner,
-            buildTabelaSimbolos: LALG.buildTabelaSimbolos,
+            buildIndiceOcorrenciasLexicas: LALG.buildIndiceOcorrenciasLexicas,
             getTokenCategoria: LALG.getTokenCategoria,
             highlightCode: LALG.highlightCode,
             codigoExemplo: LALG.CODIGO_EXEMPLO,
         });
 
         LALG.initSintaticoUI({
-            analisarDeclaracoesVariaveis: LALG.analisarDeclaracoesVariaveis,
+            analisarPrograma: LALG.analisarPrograma,
             getTokenCategoria: LALG.getTokenCategoria,
             highlightCode: LALG.highlightCode,
-            exemploDeclaracoes: EXEMPLO_DECLARACOES,
+            exemploPrograma: EXEMPLO_PROGRAMA,
+        });
+
+        LALG.initSemanticoUI({
+            analisarSemantica: LALG.analisarSemantica,
+            gerarMepa: LALG.gerarMepa,
+            MepaInterpreter: LALG.MepaInterpreter,
+            highlightCode: LALG.highlightCode,
+            exemploPrograma: EXEMPLO_PROGRAMA,
         });
     }
 

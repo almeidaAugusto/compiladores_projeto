@@ -16,12 +16,6 @@
         OR: 11,
         AND: 12,
         DIV: 13,
-        READ: 14,
-        WRITE: 15,
-        TRUE: 16,
-        FALSE: 17,
-        INT: 18,
-        BOOLEAN: 19,
         IDENTIFICADOR: 20,
         NUMERO: 21,
         ATRIBUICAO: 22,
@@ -42,6 +36,7 @@
         MAIS: 37,
         MENOS: 38,
         VEZES: 39,
+        EOF: 40,
     });
 
     const TOKEN_NOMES = {
@@ -59,12 +54,6 @@
         [TOKENS.OR]: "OR",
         [TOKENS.AND]: "AND",
         [TOKENS.DIV]: "DIV",
-        [TOKENS.READ]: "READ",
-        [TOKENS.WRITE]: "WRITE",
-        [TOKENS.TRUE]: "TRUE",
-        [TOKENS.FALSE]: "FALSE",
-        [TOKENS.INT]: "INT",
-        [TOKENS.BOOLEAN]: "BOOLEAN",
         [TOKENS.IDENTIFICADOR]: "IDENTIFICADOR",
         [TOKENS.NUMERO]: "NUMERO",
         [TOKENS.ATRIBUICAO]: "ATRIBUICAO",
@@ -85,6 +74,7 @@
         [TOKENS.MAIS]: "MAIS",
         [TOKENS.MENOS]: "MENOS",
         [TOKENS.VEZES]: "VEZES",
+        [TOKENS.EOF]: "EOF",
     };
 
     const PALAVRAS_RESERVADAS = new Map([
@@ -102,13 +92,11 @@
         ["or", TOKENS.OR],
         ["and", TOKENS.AND],
         ["div", TOKENS.DIV],
-        ["read", TOKENS.READ],
-        ["write", TOKENS.WRITE],
-        ["true", TOKENS.TRUE],
-        ["false", TOKENS.FALSE],
-        ["int", TOKENS.INT],
-        ["boolean", TOKENS.BOOLEAN],
     ]);
+
+    // LALG.pdf classifica int, boolean, read, write, true e false como
+    // identificadores pre-declarados. A Aula2 apresenta uma codificacao
+    // lexical historica diferente; aqui prevalece a especificacao da LALG.
 
     const CODIGO_EXEMPLO = `program exemplo;
 { Programa de exemplo da linguagem LALG }
@@ -141,13 +129,14 @@ begin
 end.`;
 
     function getTokenCategoria(cod) {
-        if (cod >= TOKENS.PROGRAM && cod <= TOKENS.BOOLEAN) return "Palavra Reservada";
+        if (cod >= TOKENS.PROGRAM && cod <= TOKENS.DIV) return "Palavra Reservada";
         if (cod === TOKENS.IDENTIFICADOR) return "Identificador";
         if (cod === TOKENS.NUMERO) return "N\u00famero";
         if (cod === TOKENS.ATRIBUICAO) return "Atribui\u00e7\u00e3o";
         if (cod >= TOKENS.PONTO_VIRGULA && cod <= TOKENS.FECHA_COL) return "Delimitador";
         if (cod >= TOKENS.IGUAL && cod <= TOKENS.MAIOR_IGUAL) return "Operador Relacional";
         if (cod === TOKENS.MAIS || cod === TOKENS.MENOS || cod === TOKENS.VEZES) return "Operador Aritm\u00e9tico";
+        if (cod === TOKENS.EOF) return "Fim da Entrada";
         return "Desconhecido";
     }
 
