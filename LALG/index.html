@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analisador Léxico - LALG</title>
+    <title>Analisadores LALG</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -26,9 +26,20 @@
     <script defer src="src/parser/token-adapter.js"></script>
     <script defer src="src/parser/token-stream.js"></script>
     <script defer src="src/parser/syntax-error.js"></script>
-    <script defer src="src/parser/variable-declarations-parser.js"></script>
+    <script defer src="src/parser/program-parser.js"></script>
     <script defer src="src/parser/index.js"></script>
+    <script defer src="src/semantic/semantic-error.js"></script>
+    <script defer src="src/semantic/scope.js"></script>
+    <script defer src="src/semantic/symbol-table.js"></script>
+    <script defer src="src/semantic/semantic-analyzer.js"></script>
+    <script defer src="src/mepa/opcodes.js"></script>
+    <script defer src="src/mepa/instruction.js"></script>
+    <script defer src="src/mepa/runtime-error.js"></script>
+    <script defer src="src/mepa/code-generator.js"></script>
+    <script defer src="src/mepa/interpreter.js"></script>
+    <script defer src="src/mepa/pipeline.js"></script>
     <script defer src="src/ui/init-sintatico-ui.js"></script>
+    <script defer src="src/ui/init-semantico-ui.js"></script>
     <script defer src="app.js"></script>
 </head>
 
@@ -49,6 +60,12 @@
                     <span class="material-symbols-rounded">account_tree</span>
                 </div>
                 <span class="nav-label">Analisador Sintático</span>
+            </button>
+            <button class="nav-item" data-tab="tabSemantico" title="Analisador Semântico">
+                <div class="nav-indicator">
+                    <span class="material-symbols-rounded">rule</span>
+                </div>
+                <span class="nav-label">Analisador Semântico</span>
             </button>
         </div>
     </nav>
@@ -110,7 +127,7 @@
                     </button>
                     <button class="output-tab" data-output="outputSimbolos">
                         <span class="material-symbols-rounded">table_chart</span>
-                        Tabela de Símbolos
+                        Índice de identificadores
                         <span class="badge" id="simbolosCount">0</span>
                     </button>
                     <button class="output-tab" data-output="outputErros">
@@ -172,7 +189,7 @@
                     <div class="editor-wrapper">
                         <pre class="highlight-overlay" id="sintHighlightOverlay" aria-hidden="true"></pre>
                         <textarea id="sintInputExpr" class="code-editor"
-                            placeholder="Digite somente declarações de variáveis.&#10;Ex.: int a, b;&#10;boolean ativo;"
+                            placeholder="Digite um programa LALG completo.&#10;Ex.: program teste;&#10;begin&#10;  x := 1&#10;end."
                             spellcheck="false"></textarea>
                     </div>
                 </div>
@@ -212,6 +229,129 @@
                 </div>
                 <div id="sintOutputErros" class="output-content">
                     <div id="sintErrorArea" class="error-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tabSemantico" class="tab-panel">
+            <div class="editor-card">
+                <div class="editor-toolbar">
+                    <div class="toolbar-title">
+                        <span class="material-symbols-rounded">fact_check</span>
+                        <span>Editor</span>
+                    </div>
+                    <div class="toolbar-actions">
+                        <button id="btnSemanticoExemplo" class="toolbar-btn" title="Carregar Exemplo">
+                            <span class="material-symbols-rounded">science</span>
+                            <span>Exemplo</span>
+                        </button>
+                        <button id="btnSemanticoCarregar" class="toolbar-btn" title="Carregar Arquivo">
+                            <span class="material-symbols-rounded">upload_file</span>
+                            <span>Carregar</span>
+                        </button>
+                        <input type="file" id="semFileInput" accept=".txt,.lalg" style="display:none">
+                        <button id="btnSemanticoSalvar" class="toolbar-btn" title="Salvar código fonte">
+                            <span class="material-symbols-rounded">save</span>
+                            <span>Salvar</span>
+                        </button>
+                        <button id="btnSemanticoLimpar" class="toolbar-btn" title="Limpar">
+                            <span class="material-symbols-rounded">delete</span>
+                        </button>
+                        <button id="btnSemanticoCompilar" class="toolbar-btn primary" title="Analisar semanticamente">
+                            <span class="material-symbols-rounded">play_arrow</span>
+                            <span>Compilar</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="editor-body">
+                    <div class="line-numbers" id="semLineNumbers">1</div>
+                    <div class="editor-wrapper">
+                        <pre class="highlight-overlay" id="semHighlightOverlay" aria-hidden="true"></pre>
+                        <textarea id="semInputExpr" class="code-editor"
+                            placeholder="Digite um programa LALG completo.&#10;Ex.: program teste;&#10;int x;&#10;begin&#10;  x := 1&#10;end."
+                            spellcheck="false"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="output-panel">
+                <div class="output-tabs">
+                    <button class="output-tab active" data-output="semOutputResumo">
+                        <span class="material-symbols-rounded">checklist</span>
+                        Análise Semântica
+                        <span class="badge" id="semStatusBadge">-</span>
+                    </button>
+                    <button class="output-tab" data-output="semOutputSimbolos">
+                        <span class="material-symbols-rounded">table_chart</span>
+                        Tabela de símbolos
+                        <span class="badge" id="semSymbolCount">0</span>
+                    </button>
+                    <button class="output-tab" data-output="semOutputEscopos">
+                        <span class="material-symbols-rounded">account_tree</span>
+                        Escopos
+                        <span class="badge" id="semScopeCount">0</span>
+                    </button>
+                    <button class="output-tab" data-output="semOutputErros">
+                        <span class="material-symbols-rounded">error</span>
+                        Erros
+                        <span class="badge error" id="semErrorCount">0</span>
+                    </button>
+                    <button class="output-tab" data-output="semOutputAvisos">
+                        <span class="material-symbols-rounded">warning</span>
+                        Avisos
+                        <span class="badge warning" id="semWarningCount">0</span>
+                    </button>
+                    <button class="output-tab" data-output="semOutputMepa">
+                        <span class="material-symbols-rounded">memory</span>
+                        Código MEPA
+                        <span class="badge" id="semMepaInstructionCount">0</span>
+                    </button>
+                    <button class="output-tab" data-output="semOutputExecucao">
+                        <span class="material-symbols-rounded">terminal</span>
+                        Execução MEPA
+                        <span class="badge" id="semMepaExecutionStatus">-</span>
+                    </button>
+                </div>
+                <div id="semOutputResumo" class="output-content active">
+                    <div id="semResumoArea" class="result-table-area"></div>
+                </div>
+                <div id="semOutputSimbolos" class="output-content">
+                    <div id="semSimbolosArea" class="result-table-area"></div>
+                </div>
+                <div id="semOutputEscopos" class="output-content">
+                    <div id="semEscoposArea" class="result-table-area"></div>
+                </div>
+                <div id="semOutputErros" class="output-content">
+                    <div id="semErrorArea" class="error-list"></div>
+                </div>
+                <div id="semOutputAvisos" class="output-content">
+                    <div id="semAvisosArea" class="error-list"></div>
+                </div>
+                <div id="semOutputMepa" class="output-content">
+                    <div id="semMepaArea" class="result-table-area"></div>
+                </div>
+                <div id="semOutputExecucao" class="output-content">
+                    <div class="mepa-execution-controls">
+                        <label class="mepa-execution-label" for="semMepaInput">Entrada do programa</label>
+                        <textarea id="semMepaInput" class="mepa-execution-input"
+                            placeholder="Valores para read, separados por espaços, vírgulas ou linhas."
+                            spellcheck="false"></textarea>
+                        <div class="mepa-execution-actions">
+                            <button id="btnSemanticoReiniciar" class="toolbar-btn" type="button" disabled>
+                                <span class="material-symbols-rounded">restart_alt</span>
+                                <span>Reiniciar</span>
+                            </button>
+                            <button id="btnSemanticoProximoPasso" class="toolbar-btn" type="button" disabled>
+                                <span class="material-symbols-rounded">skip_next</span>
+                                <span>Próximo passo</span>
+                            </button>
+                            <button id="btnSemanticoExecutar" class="toolbar-btn primary" type="button" disabled>
+                                <span class="material-symbols-rounded">play_arrow</span>
+                                <span>Executar</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="semMepaExecucaoArea" class="result-table-area"></div>
                 </div>
             </div>
         </section>

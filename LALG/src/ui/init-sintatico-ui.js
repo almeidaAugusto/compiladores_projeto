@@ -5,13 +5,15 @@
     function extrairMarcacoesErro(resultado) {
         if (!resultado || resultado.ok) return [];
         if (resultado.etapa === "lexico") {
-            if (resultado.erro?.index == null) return [];
-            return [{ index: resultado.erro.index }];
+            return (resultado.erros ?? [])
+                .filter((erro) => erro?.index != null)
+                .map((erro) => ({ index: erro.index }));
         }
 
-        const token = resultado.erro?.detalhe?.encontrado;
-        if (!token || token.startIndex == null) return [];
-        return [{ index: token.startIndex }];
+        return (resultado.erros ?? [])
+            .map((erro) => erro?.detalhe?.encontrado)
+            .filter((token) => token && token.startIndex != null)
+            .map((token) => ({ index: token.startIndex }));
     }
 
     function contarTokensVisiveis(resultado) {
@@ -20,10 +22,10 @@
     }
 
     function initSintaticoUI({
-        analisarDeclaracoesVariaveis,
+        analisarPrograma,
         getTokenCategoria,
         highlightCode,
-        exemploDeclaracoes,
+        exemploPrograma,
     }) {
         const {
             renderSintaticoResumoArea,
@@ -86,17 +88,18 @@
                 statusBadge.classList.remove("error", "success");
                 statusBadge.classList.add(resultado.ok ? "success" : "error");
                 tokenCountBadge.textContent = String(contarTokensVisiveis(resultado));
-                declarationCountBadge.textContent = String(resultado.ok ? resultado.declaracoes.length : 0);
-                errorCountBadge.textContent = resultado.ok ? "0" : "1";
+                declarationCountBadge.textContent = String(resultado.declaracoes?.length ?? 0);
+                errorCountBadge.textContent = String(resultado.erros?.length ?? (resultado.ok ? 0 : 1));
             }
 
             function bindErrorSelection() {
                 errorArea.querySelectorAll(".error-clickable").forEach((item) => {
                     item.addEventListener("click", () => {
                         const idx = parseInt(item.dataset.errorIndex, 10);
+                        const endIdx = parseInt(item.dataset.errorEndIndex, 10);
                         if (isNaN(idx)) return;
 
-                        const end = Math.min(idx + 1, inputExpr.value.length);
+                        const end = Math.min((isNaN(endIdx) ? idx : endIdx) + 1, inputExpr.value.length);
                         inputExpr.focus();
                         inputExpr.setSelectionRange(idx, end);
                     });
@@ -151,7 +154,7 @@
             inputExpr.addEventListener("scroll", syncScroll);
 
             btnExemplo.addEventListener("click", () => {
-                inputExpr.value = exemploDeclaracoes;
+                inputExpr.value = exemploPrograma;
                 updateLineNumbers();
                 invalidateResultado();
                 switchToTab("sintOutputResumo");
@@ -191,7 +194,7 @@
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement("a");
                 link.href = url;
-                link.download = "declaracoes_variaveis.lalg";
+                link.download = "programa.lalg";
                 link.click();
                 URL.revokeObjectURL(url);
             });
@@ -209,7 +212,7 @@
                     return;
                 }
 
-                const resultado = analisarDeclaracoesVariaveis(expr);
+                const resultado = analisarPrograma(expr);
                 state.ultimoResultado = resultado;
                 state.marcacoesErro = extrairMarcacoesErro(resultado);
 
